@@ -167,9 +167,10 @@ export class GameMeetup {
 			true
 		);
 
+
 		embed.addField(
 			'Date',
-			`${GameMeetup.formatDate(this._info.meetdate)}`,
+			`${this._info.meetdate.toLocaleDateString('fr-FR')}`,
 			true
 		);
 
@@ -299,6 +300,18 @@ export class GameMeetup {
 		const message = MessageUtil.generateEmbedMessage(
 			'Game Meetup Started',
 			`The game of ${this._info.game} is starting.`,
+			0xffff00
+		);
+		message.content = `<#${this._channels.voiceChannel?.id}>`;
+		return message;
+	}
+
+	private generateYouCanStillJoinMessage(): MessageOptions {
+		const message = MessageUtil.generateEmbedMessage(
+			'Game Meetup Reminder',
+			`You can still join the game meetup for ${this._info.game}.\n
+			there is still ${this._info.max_participants - (this._channels.voiceChannel?.members.size || 0)} places left.`
+			,
 			0xffff00
 		);
 		message.content = `<#${this._channels.voiceChannel?.id}>`;
@@ -468,6 +481,7 @@ export class GameMeetup {
 		);
 
 		// after 5 minutes after the meetup send started a notification to the participants not connected in the voice chat
+		// and to all maybe participants if the meetup is not full
 		const absent_time = this._info.meetdate.getTime() + 5 * 60 * 1000;
 		if (absent_time > Date.now()) {
 			this._timers.push(
@@ -475,6 +489,11 @@ export class GameMeetup {
 					this.sendMesageToParticipantsNotInChannel(
 						this.generateAbsentMessage()
 					);
+					if (this._info.max_participants > (this._channels.voiceChannel?.members.size || 0)) {
+						this._maybe_participants.forEach((p) => {
+							p.send(this.generateAbsentMessage());
+						});
+					}
 				}, absent_time - Date.now())
 			);
 		}
