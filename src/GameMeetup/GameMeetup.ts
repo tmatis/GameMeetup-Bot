@@ -154,19 +154,15 @@ export class GameMeetup {
 		if (this._info.max_participants !== Infinity)
 			embed.addField(
 				'Participants',
-				`${this._participants.length}/${this._info.max_participants}${this._participants.length >= this._info.max_participants
-					? ' (full)'
-					: ''
+				`${this._participants.length}/${this._info.max_participants}${
+					this._participants.length >= this._info.max_participants
+						? ' (full)'
+						: ''
 				}`,
 				true
 			);
 
-		embed.addField(
-			'Creator',
-			`${this._info.creator.username}`,
-			true
-		);
-
+		embed.addField('Creator', `${this._info.creator.username}`, true);
 
 		embed.addField(
 			'Date',
@@ -255,8 +251,6 @@ export class GameMeetup {
 		return message;
 	}
 
-
-
 	private generateOverMessage(): MessageOptions {
 		return MessageUtil.generateEmbedMessage(
 			'Game Meetup Over',
@@ -296,13 +290,16 @@ export class GameMeetup {
 		return message;
 	}
 
-	private generateMeetupStartedMessage(): MessageOptions {
+	private generateMeetupStartedMessage(
+		mention_channel: boolean
+	): MessageOptions {
 		const message = MessageUtil.generateEmbedMessage(
 			'Game Meetup Started',
 			`The game of ${this._info.game} is starting.`,
 			0xffff00
 		);
-		message.content = `<#${this._channels.voiceChannel?.id}>`;
+		if (mention_channel)
+			message.content = `<#${this._channels.voiceChannel?.id}>`;
 		return message;
 	}
 
@@ -310,8 +307,10 @@ export class GameMeetup {
 		const message = MessageUtil.generateEmbedMessage(
 			'Game Meetup Reminder',
 			`You can still join the game meetup for ${this._info.game}.\n
-			there is still ${this._info.max_participants - (this._channels.voiceChannel?.members.size || 0)} places left.`
-			,
+			there is still ${
+				this._info.max_participants -
+				(this._channels.voiceChannel?.members.size || 0)
+			} places left.`,
 			0xffff00
 		);
 		message.content = `<#${this._channels.voiceChannel?.id}>`;
@@ -457,10 +456,10 @@ export class GameMeetup {
 		this._timers.push(
 			setTimeout(() => {
 				this.sendMesageToParticipantsNotInChannel(
-					this.generateMeetupStartedMessage()
+					this.generateMeetupStartedMessage(true)
 				);
 				this._channels.textChannel?.send(
-					this.generateMeetupStartedMessage()
+					this.generateMeetupStartedMessage(false)
 				);
 			}, this._info.meetdate.getTime() - Date.now())
 		);
@@ -489,9 +488,17 @@ export class GameMeetup {
 					this.sendMesageToParticipantsNotInChannel(
 						this.generateAbsentMessage()
 					);
-					if (this._info.max_participants > (this._channels.voiceChannel?.members.size || 0)) {
+					if (
+						this._info.max_participants >
+						(this._channels.voiceChannel?.members.size || 0)
+					) {
 						this._maybe_participants.forEach((p) => {
-							p.send(this.generateAbsentMessage());
+							if (
+								!this._channels.voiceChannel?.members.find(
+									(m) => m.id === p.id
+								)
+							)
+								p.send(this.generateYouCanStillJoinMessage());
 						});
 					}
 				}, absent_time - Date.now())
@@ -552,7 +559,8 @@ export class GameMeetup {
 					if (participant_message) {
 						participant_message.edit(
 							MessageUtil.generateEmbedMessage(
-								`Game Meetup: ${this._info.game
+								`Game Meetup: ${
+									this._info.game
 								} ${GameMeetup.formatDate(
 									this._info.meetdate
 								)}`,
@@ -593,7 +601,8 @@ export class GameMeetup {
 						interaction.user.id
 					]?.edit(
 						MessageUtil.generateEmbedMessage(
-							`Game Meetup: ${this._info.game
+							`Game Meetup: ${
+								this._info.game
 							} ${GameMeetup.formatDate(this._info.meetdate)}`,
 							'You canceled your participation.',
 							0xff0000
