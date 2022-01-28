@@ -194,16 +194,6 @@ export class GameMeetup {
 
 	/* message generators */
 
-	private generateChannelLinkButton(): MessageActionRow {
-		// https://discordapp.com/channels/SERVERID/CHANNELID
-		const link = `https://discordapp.com/channels/${this._info.guild.id}/${this._channels.voiceChannel?.id}`;
-		const button = new MessageButton()
-			.setLabel('See channel')
-			.setURL(link)
-			.setStyle('LINK');
-		return new MessageActionRow().addComponents([button]);
-	}
-
 	private generateGeneralMessage(): MessageOptions {
 		return {
 			embeds: [this.generateEmbed()],
@@ -253,15 +243,7 @@ export class GameMeetup {
 		return message;
 	}
 
-	private generateReminderMessage(): MessageOptions {
-		const message = MessageUtil.generateEmbedMessage(
-			'Game Meetup Reminder',
-			`The game of ${this._info.game} is starting in 10 mins.`,
-			0xffff00
-		);
-		message.components = [this.generateChannelLinkButton()];
-		return message;
-	}
+
 
 	private generateOverMessage(): MessageOptions {
 		return MessageUtil.generateEmbedMessage(
@@ -282,13 +264,23 @@ export class GameMeetup {
 		};
 	}
 
+	private generateReminderMessage(): MessageOptions {
+		const message = MessageUtil.generateEmbedMessage(
+			'Game Meetup Reminder',
+			`The game of ${this._info.game} is starting in 10 mins.`,
+			0xffff00
+		);
+		message.content = `<#${this._channels.voiceChannel?.id}>`;
+		return message;
+	}
+	
 	private generateAbsentMessage(): MessageOptions {
 		const message = MessageUtil.generateEmbedMessage(
 			'Absent to Game Meetup',
 			`You are absent from the game meetup for ${this._info.game}, please join or cancel.`,
 			0xff0000
 		);
-		message.components = [this.generateChannelLinkButton()];
+		message.content = `<#${this._channels.voiceChannel?.id}>`;
 		return message;
 	}
 
@@ -298,7 +290,7 @@ export class GameMeetup {
 			`The game of ${this._info.game} is starting.`,
 			0xffff00
 		);
-		message.components = [this.generateChannelLinkButton()];
+		message.content = `<#${this._channels.voiceChannel?.id}>`;
 		return message;
 	}
 
