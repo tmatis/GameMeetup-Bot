@@ -151,20 +151,31 @@ export class GameMeetup {
 			`${this._info.creator.username} created this game meetup.`
 		);
 
-		// add field about number of participants
-
 		if (this._info.max_participants !== Infinity)
 			embed.addField(
 				'Participants',
-				`${this._participants.length}/${this._info.max_participants}${
-					this._participants.length >= this._info.max_participants
-						? ' (full)'
-						: ''
+				`${this._participants.length}/${this._info.max_participants}${this._participants.length >= this._info.max_participants
+					? ' (full)'
+					: ''
 				}`,
-				false
+				true
 			);
 
-		// add the participants each participant is a field
+		embed.addField(
+			'Creator',
+			`${this._info.creator.username}`,
+			true
+		);
+
+		embed.addField(
+			'Date',
+			`${GameMeetup.formatDate(this._info.meetdate)}`,
+			true
+		);
+
+		// add empty field to make the embed look nice
+
+		embed.addField('\u200b', 'Participants list', false);
 
 		let fields: EmbedFieldData[] = this._participants.map((p) => {
 			return {
@@ -273,7 +284,7 @@ export class GameMeetup {
 		message.content = `<#${this._channels.voiceChannel?.id}>`;
 		return message;
 	}
-	
+
 	private generateAbsentMessage(): MessageOptions {
 		const message = MessageUtil.generateEmbedMessage(
 			'Absent to Game Meetup',
@@ -522,8 +533,7 @@ export class GameMeetup {
 					if (participant_message) {
 						participant_message.edit(
 							MessageUtil.generateEmbedMessage(
-								`Game Meetup: ${
-									this._info.game
+								`Game Meetup: ${this._info.game
 								} ${GameMeetup.formatDate(
 									this._info.meetdate
 								)}`,
@@ -564,8 +574,7 @@ export class GameMeetup {
 						interaction.user.id
 					]?.edit(
 						MessageUtil.generateEmbedMessage(
-							`Game Meetup: ${
-								this._info.game
+							`Game Meetup: ${this._info.game
 							} ${GameMeetup.formatDate(this._info.meetdate)}`,
 							'You canceled your participation.',
 							0xff0000
