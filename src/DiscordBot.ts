@@ -1,5 +1,5 @@
 import { MessageUtil } from './MessageUtil';
-import { GameMeeting } from './GameMeeting/GameMeeting';
+import { GameMeetup } from './GameMeetup/GameMeetup';
 import { Client, Guild, Intents } from 'discord.js';
 import { ButtonHandler } from './ButtonHandler';
 import { Command, CommandHandler } from './CommandHandler';
@@ -9,7 +9,7 @@ export class DiscordBot {
 	private _client: Client;
 	private _commandHandler: CommandHandler;
 	private _buttonHandler: ButtonHandler;
-	private _gameMeetings: GameMeeting[] = [];
+	private _gameMeetups: GameMeetup[] = [];
 
 	constructor(prefix: string) {
 		this._client = new Client({
@@ -43,7 +43,7 @@ export class DiscordBot {
 		const commands: Command[] = [
 			{
 				name: 'gamemeet',
-				description: 'Create a game meeting',
+				description: 'Create a game meetup',
 				usage: 'gamemeet gamename hh:mm [max_participants]',
 				dm_disabled: true,
 				execute: async (message, args) => {
@@ -94,8 +94,8 @@ export class DiscordBot {
 						? parseInt(args[2])
 						: Infinity;
 
-					this._gameMeetings.push(
-						new GameMeeting({
+					this._gameMeetups.push(
+						new GameMeetup({
 							channel: message.channel,
 							creator: message.author,
 							game: game,
@@ -103,9 +103,9 @@ export class DiscordBot {
 							buttonHandler: this._buttonHandler,
 							max_participants: maxParticipants,
 							guild: message.guild as Guild,
-							removeMeeting: (meeting: GameMeeting) => {
-								this._gameMeetings = this._gameMeetings.filter(
-									(m) => m.id !== meeting.id
+							removeMeetup: (meetup: GameMeetup) => {
+								this._gameMeetups = this._gameMeetups.filter(
+									(m) => m.id !== meetup.id
 								);
 							},
 						})

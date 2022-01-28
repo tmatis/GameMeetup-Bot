@@ -10,42 +10,42 @@ import {
 import { ChannelTypes } from 'discord.js/typings/enums';
 import { ButtonHandler } from '../ButtonHandler';
 import {
-	GameMeetingButtons,
-	GameMeetingChannels,
-	GameMeetingInfo,
-	GameMeetingMessages,
-	GameMeetingOptions,
+	GameMeetupButtons,
+	GameMeetupChannels,
+	GameMeetupInfo,
+	GameMeetupMessages,
+	GameMeetupOptions,
 } from './GMTypes';
 import { MessageUtil } from '../MessageUtil';
 
 /*
- ** Game Meeting
- ** - The owner receive a message with the meeting information and a cancel button
- ** - the channel where the meeting is created receive a message with the meeting information and joins button
- ** - if someone joins, he receive a message with the meeting information and a cancel button
- ** - a notification is sent 10 minutes before the meeting
- ** - a second notification is sent 5 minutes after the meeting if the user is not in the voice channel
- ** - the category, voice channel and text channel are created 30 minutes before the meeting of instant if
- ** the meeting date is bellow 30 minutes
- ** - every 30 minutes the meeting check if the meeting is still active, if not, it is removed
- ** - if the meeting is removed, the channel is deleted
- ** - if the ownder cancel the meeting, the channel is deleted
- ** - if the meeting is not full ask maybe participants to join 5 minutes before the meeting
+ ** Game Meetup
+ ** - The owner receive a message with the meetup information and a cancel button
+ ** - the channel where the meetup is created receive a message with the meetup information and joins button
+ ** - if someone joins, he receive a message with the meetup information and a cancel button
+ ** - a notification is sent 10 minutes before the meetup
+ ** - a second notification is sent 5 minutes after the meetup if the user is not in the voice channel
+ ** - the category, voice channel and text channel are created 30 minutes before the meetup of instant if
+ ** the meetup date is bellow 30 minutes
+ ** - every 30 minutes the meetup check if the meetup is still active, if not, it is removed
+ ** - if the meetup is removed, the channel is deleted
+ ** - if the ownder cancel the meetup, the channel is deleted
+ ** - if the meetup is not full ask maybe participants to join 5 minutes before the meetup
  */
 
-export class GameMeeting {
+export class GameMeetup {
 	private static _nextId = 0;
 
 	private _id: number;
 	private _participants: User[];
 	private _maybe_participants: User[];
 	private _buttonHandler: ButtonHandler;
-	private _removeMeeting: (meeting: GameMeeting) => void;
+	private _removeMeetup: (meetup: GameMeetup) => void;
 	private _timers: NodeJS.Timeout[];
 
-	private _info: GameMeetingInfo;
-	private _buttons: GameMeetingButtons;
-	private _messages: GameMeetingMessages = {
+	private _info: GameMeetupInfo;
+	private _buttons: GameMeetupButtons;
+	private _messages: GameMeetupMessages = {
 		generalMessage: undefined,
 		ownerMessage: undefined,
 		channelMessage: undefined,
@@ -53,7 +53,7 @@ export class GameMeeting {
 		maybeParticipantsMessage: {},
 	}; // we need to init here to avoid ts error
 
-	private _channels: GameMeetingChannels = {
+	private _channels: GameMeetupChannels = {
 		categoryChannel: undefined,
 		textChannel: undefined,
 		voiceChannel: undefined,
@@ -141,14 +141,14 @@ export class GameMeeting {
 	private generateEmbed(): MessageEmbed {
 		const embed = new MessageEmbed();
 
-		// the title will be in the format "Game Meeting: <game> hh:mm"
-		const title = `Game Meeting: ${
+		// the title will be in the format "Game Meetup: <game> hh:mm"
+		const title = `Game Meetup: ${
 			this._info.game
-		} ${GameMeeting.formatDate(this._info.meetdate)}`;
+		} ${GameMeetup.formatDate(this._info.meetdate)}`;
 		embed.setTitle(title);
 		embed.setColor(0x00ff00);
 		embed.setDescription(
-			`${this._info.creator.username} created this game meeting.`
+			`${this._info.creator.username} created this game meetup.`
 		);
 
 		// add field about number of participants
@@ -207,7 +207,7 @@ export class GameMeeting {
 	private generateOwnerMessage(): MessageOptions {
 		return {
 			content:
-				'You created this game meeting, you can cancel it by clicking the button below.',
+				'You created this game meetup, you can cancel it by clicking the button below.',
 			embeds: [this.generateEmbed()],
 			components: [this._buttons.ownerButtons],
 		};
@@ -215,7 +215,7 @@ export class GameMeeting {
 
 	private generateParticipantMessage(): MessageOptions {
 		return {
-			content: 'You joined a game meeting, please be present or cancel.',
+			content: 'You joined a game meetup, please be present or cancel.',
 			embeds: [this.generateEmbed()],
 			components: [this._buttons.participantButtons],
 		};
@@ -224,7 +224,7 @@ export class GameMeeting {
 	private generateMaybeParticipantMessage(): MessageOptions {
 		return {
 			content:
-				'You are maybe participating in a game meeting, confirm or cancel.',
+				'You are maybe participating in a game meetup, confirm or cancel.',
 			embeds: [this.generateEmbed()],
 			components:
 				this._participants.length >= this._info.max_participants
@@ -235,8 +235,8 @@ export class GameMeeting {
 
 	private generateCancelledMessage(): MessageOptions {
 		const message = MessageUtil.generateEmbedMessage(
-			'Game Meeting Cancelled',
-			`The game meeting for ${this._info.game} was cancelled by ${this._info.creator.username}.`,
+			'Game Meetup Cancelled',
+			`The game meetup for ${this._info.game} was cancelled by ${this._info.creator.username}.`,
 			0xff0000
 		);
 		message.content = 'Canceled';
@@ -245,7 +245,7 @@ export class GameMeeting {
 
 	private generateReminderMessage(): MessageOptions {
 		return MessageUtil.generateEmbedMessage(
-			'Game Meeting Reminder',
+			'Game Meetup Reminder',
 			`The game of ${this._info.game} is starting in 10 mins.`,
 			0xffff00
 		);
@@ -253,10 +253,10 @@ export class GameMeeting {
 
 	private generateOverMessage(): MessageOptions {
 		return MessageUtil.generateEmbedMessage(
-			'Game Meeting Over',
+			'Game Meetup Over',
 			`The game of ${this._info.game} is over.
 			The participants were: ${this._participants.map((p) => p.username).join(', ')}
-			Thank you for using GameMeeting. If you find any bugs report to Frost`,
+			Thank you for using GameMeetup. If you find any bugs report to Frost`,
 			0xff0000
 		);
 	}
@@ -272,15 +272,15 @@ export class GameMeeting {
 
 	private generateAbsentMessage(): MessageOptions {
 		return MessageUtil.generateEmbedMessage(
-			'Absent to Game Meeting',
-			`You are absent from the game meeting for ${this._info.game}, please join or cancel.`,
+			'Absent to Game Meetup',
+			`You are absent from the game meetup for ${this._info.game}, please join or cancel.`,
 			0xff0000
 		);
 	}
 
-	private generateMeetingStartedMessage(): MessageOptions {
+	private generateMeetupStartedMessage(): MessageOptions {
 		return MessageUtil.generateEmbedMessage(
-			'Game Meeting Started',
+			'Game Meetup Started',
 			`The game of ${this._info.game} is starting.`,
 			0xffff00
 		);
@@ -288,7 +288,7 @@ export class GameMeeting {
 
 	/*
 	 ** this function will update all messages they act like components that will be refreshed
-	 ** every time the game meeting is updated
+	 ** every time the game meetup is updated
 	 */
 
 	private updateMessages() {
@@ -324,7 +324,7 @@ export class GameMeeting {
 		this._timers.forEach((t) => clearTimeout(t));
 		this.destroyButtons();
 		this.deleteChannels();
-		this._removeMeeting(this);
+		this._removeMeetup(this);
 	}
 
 	private setAllMessages(message: MessageOptions) {
@@ -350,14 +350,14 @@ export class GameMeeting {
 	}
 
 	/*
-	 ** this function create a category for the game meeting
+	 ** this function create a category for the game meetup
 	 ** then add two channels to the category, all are public
 	 ** one for voice and one for text
 	 */
 
 	private async createChannels() {
 		this._channels.categoryChannel = await this._info.guild.channels.create(
-			`${this._info.game}-game-meeting`,
+			`${this._info.game}-game-meetup`,
 			{
 				type: ChannelTypes.GUILD_CATEGORY,
 			}
@@ -411,7 +411,7 @@ export class GameMeeting {
 			);
 		}
 
-		// 30 minutes before the meeting create channels else create channel now
+		// 30 minutes before the meetup create channels else create channel now
 		const channel_time = this._info.meetdate.getTime() - 30 * 60 * 1000;
 		if (channel_time > Date.now()) {
 			this._timers.push(
@@ -421,19 +421,19 @@ export class GameMeeting {
 			);
 		} else this.createChannels();
 
-		// on the meeting date send a message to all participants not in the channel
+		// on the meetup date send a message to all participants not in the channel
 		this._timers.push(
 			setTimeout(() => {
 				this.sendMesageToParticipantsNotInChannel(
-					this.generateMeetingStartedMessage()
+					this.generateMeetupStartedMessage()
 				);
 				this._channels.textChannel?.send(
-					this.generateMeetingStartedMessage()
+					this.generateMeetupStartedMessage()
 				);
 			}, this._info.meetdate.getTime() - Date.now())
 		);
 
-		// every 15 after the meeting started check every 15 minutes if there is still people in voice chat
+		// every 15 after the meetup started check every 15 minutes if there is still people in voice chat
 		const check_time = this._info.meetdate.getTime() + 15 * 60 * 1000;
 		this._timers.push(
 			setInterval(() => {
@@ -448,7 +448,7 @@ export class GameMeeting {
 			}, 15 * 60 * 1000)
 		);
 
-		// after 5 minutes after the meeting send started a notification to the participants not connected in the voice chat
+		// after 5 minutes after the meetup send started a notification to the participants not connected in the voice chat
 		const absent_time = this._info.meetdate.getTime() + 5 * 60 * 1000;
 		if (absent_time > Date.now()) {
 			this._timers.push(
@@ -461,8 +461,8 @@ export class GameMeeting {
 		}
 	}
 
-	constructor(gameMeetOptions: GameMeetingOptions) {
-		this._id = GameMeeting._nextId++;
+	constructor(gameMeetOptions: GameMeetupOptions) {
+		this._id = GameMeetup._nextId++;
 		this._info = {
 			creator: gameMeetOptions.creator,
 			game: gameMeetOptions.game,
@@ -474,7 +474,7 @@ export class GameMeeting {
 		this._participants = [this._info.creator];
 		this._maybe_participants = [];
 		this._buttonHandler = gameMeetOptions.buttonHandler;
-		this._removeMeeting = gameMeetOptions.removeMeeting;
+		this._removeMeetup = gameMeetOptions.removeMeetup;
 		this._timers = [];
 
 		const generalButtonsTable: MessageButton[] = [];
@@ -514,9 +514,9 @@ export class GameMeeting {
 					if (participant_message) {
 						participant_message.edit(
 							MessageUtil.generateEmbedMessage(
-								`Game Meeting: ${
+								`Game Meetup: ${
 									this._info.game
-								} ${GameMeeting.formatDate(
+								} ${GameMeetup.formatDate(
 									this._info.meetdate
 								)}`,
 								'You canceled your participation.',
@@ -556,9 +556,9 @@ export class GameMeeting {
 						interaction.user.id
 					]?.edit(
 						MessageUtil.generateEmbedMessage(
-							`Game Meeting: ${
+							`Game Meetup: ${
 								this._info.game
-							} ${GameMeeting.formatDate(this._info.meetdate)}`,
+							} ${GameMeetup.formatDate(this._info.meetdate)}`,
 							'You canceled your participation.',
 							0xff0000
 						)
@@ -601,8 +601,8 @@ export class GameMeeting {
 			);
 		})();
 
-		// 10 minutes before the meeting send a reminder to all participants
-		// if the meeting is sooner than 10 minutes do nothing
+		// 10 minutes before the meetup send a reminder to all participants
+		// if the meetup is sooner than 10 minutes do nothing
 		this.setupTimers();
 	}
 }

@@ -9,9 +9,9 @@ import {
 } from 'discord.js';
 import { ButtonHandler } from '../ButtonHandler';
 import { GenericChannel } from '../MessageUtil';
-import { GameMeeting } from './GameMeeting';
+import { GameMeetup } from './GameMeetup';
 
-export type GameMeetingOptions = {
+export type GameMeetupOptions = {
 	channel: GenericChannel;
 	creator: User;
 	game: string;
@@ -19,10 +19,10 @@ export type GameMeetingOptions = {
 	buttonHandler: ButtonHandler;
 	max_participants: number;
 	guild: Guild;
-	removeMeeting: (meeting: GameMeeting) => void;
+	removeMeetup: (meetup: GameMeetup) => void;
 };
 
-export type GameMeetingInfo = {
+export type GameMeetupInfo = {
 	creator: User;
 	game: string;
 	meetdate: Date;
@@ -30,14 +30,14 @@ export type GameMeetingInfo = {
 	guild: Guild;
 };
 
-export type GameMeetingButtons = {
+export type GameMeetupButtons = {
 	generalButtons: MessageActionRow;
 	ownerButtons: MessageActionRow;
 	participantButtons: MessageActionRow;
 	maybeParticipantButtons: MessageActionRow;
 };
 
-export type GameMeetingMessages = {
+export type GameMeetupMessages = {
 	generalMessage?: Message;
 	ownerMessage?: Message;
 	channelMessage?: Message;
@@ -45,7 +45,7 @@ export type GameMeetingMessages = {
 	maybeParticipantsMessage: { [userid: string]: Message | undefined };
 };
 
-export type GameMeetingChannels = {
+export type GameMeetupChannels = {
 	categoryChannel?: CategoryChannel;
 	textChannel?: TextChannel;
 	voiceChannel?: VoiceChannel;
