@@ -142,9 +142,9 @@ export class GameMeetup {
 		const embed = new MessageEmbed();
 
 		// the title will be in the format "Game Meetup: <game> hh:mm"
-		const title = `Game Meetup: ${
-			this._info.game
-		} ${GameMeetup.formatDate(this._info.meetdate)}`;
+		const title = `Game Meetup: ${this._info.game} ${GameMeetup.formatDate(
+			this._info.meetdate
+		)}`;
 		embed.setTitle(title);
 		embed.setColor(0x00ff00);
 		embed.setDescription(
