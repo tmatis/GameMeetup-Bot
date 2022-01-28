@@ -1,9 +1,9 @@
 import { MessageUtil } from './MessageUtil';
-import { GameMeetup } from './GameMeetup/GameMeetup';
 import { Client, Guild, Intents } from 'discord.js';
 import { ButtonHandler } from './ButtonHandler';
 import { Command, CommandHandler } from './CommandHandler';
 import { Logger } from './Logger';
+import { GameMeetup } from './GameMeetup/GameMeetup';
 
 export class DiscordBot {
 	private _client: Client;
