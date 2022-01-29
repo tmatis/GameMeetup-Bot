@@ -107,8 +107,6 @@ export class DiscordBot {
 								'Bad date format! Use `need hh:mm`'
 							);
 						}
-
-						
 					} catch (e) {
 						MessageUtil.sendErrorMessage(
 							message.channel,
