@@ -1,4 +1,4 @@
-FROM node:alpine as builder
+FROM node:latest as builder
 
 ENV NODE_ENV build
 
@@ -19,15 +19,12 @@ RUN yarn build
 
 # ---
 
-FROM node:alpine
+FROM node:latest
 
 ENV NODE_ENV production
 
 WORKDIR /app
 
-RUN apk update && apk add tzdata
-
-RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo "Europe/Paris" >  /etc/timezone
 RUN chown -R node:node /app && chmod -R 755 /app
 
 USER node
