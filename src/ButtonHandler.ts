@@ -1,3 +1,4 @@
+import { Logger } from './Logger';
 import {
 	ButtonInteraction,
 	Client,
@@ -79,6 +80,9 @@ export class ButtonHandler {
 
 		this._buttons.push(newButton);
 
+		Logger.debug(
+			`registered button with uuid ${newButton.uuid} and label ${newButton.label}`
+		);
 		return new MessageButton()
 			.setCustomId(newButton.uuid)
 			.setLabel(newButton.label)
@@ -87,5 +91,6 @@ export class ButtonHandler {
 
 	public removeButton(uuid: string) {
 		this._buttons = this._buttons.filter((b) => b.uuid !== uuid);
+		Logger.debug(`removed button with uuid ${uuid} from button list`);
 	}
 }

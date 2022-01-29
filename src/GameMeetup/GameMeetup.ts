@@ -1,3 +1,4 @@
+import { Logger } from './../Logger';
 import {
 	ButtonInteraction,
 	EmbedFieldData,
@@ -85,6 +86,9 @@ export class GameMeetup {
 		this._participants.splice(index, 1);
 		// remove participant message
 		delete this._messages.participantsMessage[user.id];
+		Logger.debug(
+			`GameMeetup ${this._id} removeParticipant ${user.username}`
+		);
 		this.updateMessages();
 	}
 
@@ -97,6 +101,9 @@ export class GameMeetup {
 		this._maybe_participants.splice(index, 1);
 		// remove participant message
 		delete this._messages.maybeParticipantsMessage[user.id];
+		Logger.debug(
+			`GameMeetup ${this._id} removeMaybeParticipant ${user.username}`
+		);
 		this.updateMessages();
 	}
 
@@ -116,6 +123,7 @@ export class GameMeetup {
 			this._messages.participantsMessage[user.id] = await user.send(
 				this.generateParticipantMessage()
 			);
+		Logger.debug(`GameMeetup ${this._id} addParticipant ${user.username}`);
 		this.updateMessages();
 	}
 
@@ -135,6 +143,9 @@ export class GameMeetup {
 			this._messages.maybeParticipantsMessage[user.id] = await user.send(
 				this.generateMaybeParticipantMessage()
 			);
+		Logger.debug(
+			`GameMeetup ${this._id} addMaybeParticipant ${user.username}`
+		);
 		this.updateMessages();
 	}
 
@@ -337,6 +348,7 @@ export class GameMeetup {
 				this.generateMaybeParticipantMessage()
 			);
 		});
+		Logger.debug(`GameMeetup ${this.id} updated messages`);
 	}
 
 	private destroyButtons() {
@@ -349,12 +361,14 @@ export class GameMeetup {
 					this._buttonHandler.removeButton(b.customId);
 			});
 		}
+		Logger.debug(`GameMeetup ${this.id} destroyed buttons`);
 	}
 
 	private delete() {
 		this._timers.forEach((t) => clearTimeout(t));
 		this.destroyButtons();
 		this.deleteChannels();
+		Logger.debug(`GameMeetup ${this.id} deleted`);
 		this._removeMeetup(this);
 	}
 
@@ -372,11 +386,13 @@ export class GameMeetup {
 
 	private cancel() {
 		this.setAllMessages(this.generateCancelledMessage());
+		Logger.debug(`GameMeetup ${this.id} cancelled`);
 		this.delete();
 	}
 
 	private over() {
 		this.setAllMessages(this.generateOverMessage());
+		Logger.debug(`GameMeetup ${this.id} over`);
 		this.delete();
 	}
 
@@ -413,6 +429,7 @@ export class GameMeetup {
 		this._messages.channelMessage = await this._channels.textChannel.send(
 			this.generateChannelMessage()
 		);
+		Logger.debug(`GameMeetup: created channels for ${this._info.game}`);
 	}
 
 	private async deleteChannels() {
@@ -430,11 +447,21 @@ export class GameMeetup {
 		});
 	}
 
+	private checkForOver() {
+		if (this._channels.voiceChannel?.members.size === 0) {
+			Logger.debug(
+				`GameMeetup ${this.id} over because no one in the voice channel`
+			);
+			this.over();
+		}
+	}
+
 	private setupTimers() {
 		const reminder_time = this._info.meetdate.getTime() - 10 * 60 * 1000;
 		if (reminder_time > Date.now()) {
 			this._timers.push(
 				setTimeout(() => {
+					Logger.debug(`GameMeetup ${this.id} reminder`);
 					this.sendMesageToParticipantsNotInChannel(
 						this.generateReminderMessage()
 					);
@@ -447,6 +474,7 @@ export class GameMeetup {
 		if (channel_time > Date.now()) {
 			this._timers.push(
 				setTimeout(() => {
+					Logger.debug(`GameMeetup ${this.id} create channels`);
 					this.createChannels();
 				}, channel_time - Date.now())
 			);
@@ -465,18 +493,29 @@ export class GameMeetup {
 		);
 
 		// every 15 after the meetup started check every 15 minutes if there is still people in voice chat
-		const check_time = this._info.meetdate.getTime() + 15 * 60 * 1000;
-		this._timers.push(
+		/*this._timers.push(
 			setInterval(() => {
-				if (check_time < Date.now()) {
-					if (
-						this._channels.voiceChannel &&
-						this._channels.voiceChannel.members.size === 0
-					) {
-						this.over();
-					}
+				if (
+					this._channels.voiceChannel?.members.size === 0 &&
+					this._channels.textChannel?.members.size === 0
+				) {
+					this.over();
 				}
 			}, 15 * 60 * 1000)
+		);*/
+
+		// 15 minuter after start
+
+		const end_check_time = this._info.meetdate.getTime();
+		this._timers.push(
+			setTimeout(() => {
+				this._timers.push(
+					setInterval(() => {
+						Logger.debug(`GameMeetup ${this.id} check for over`);
+						this.checkForOver();
+					}, 15 * 60 * 1000)
+				);
+			}, end_check_time - Date.now())
 		);
 
 		// after 5 minutes after the meetup send started a notification to the participants not connected in the voice chat
@@ -485,6 +524,7 @@ export class GameMeetup {
 		if (absent_time > Date.now()) {
 			this._timers.push(
 				setTimeout(() => {
+					Logger.debug(`GameMeetup ${this.id} send absent message`);
 					this.sendMesageToParticipantsNotInChannel(
 						this.generateAbsentMessage()
 					);
@@ -649,5 +689,10 @@ export class GameMeetup {
 		// 10 minutes before the meetup send a reminder to all participants
 		// if the meetup is sooner than 10 minutes do nothing
 		this.setupTimers();
+		Logger.info(
+			`GameMeetup ${this._id} created for ${
+				this._info.game
+			} ${GameMeetup.formatDate(this._info.meetdate)}`
+		);
 	}
 }

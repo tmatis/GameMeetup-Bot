@@ -104,6 +104,9 @@ export class DiscordBot {
 							max_participants: maxParticipants,
 							guild: message.guild as Guild,
 							removeMeetup: (meetup: GameMeetup) => {
+								Logger.debug(
+									`removed meetup ${meetup.id} from list`
+								);
 								this._gameMeetups = this._gameMeetups.filter(
 									(m) => m.id !== meetup.id
 								);
@@ -115,5 +118,8 @@ export class DiscordBot {
 		];
 
 		commands.forEach((c) => this._commandHandler.registerCommand(c));
+		Logger.debug(
+			`registered ${commands.length} commands in the command handler`
+		);
 	}
 }

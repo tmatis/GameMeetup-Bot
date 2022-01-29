@@ -5,6 +5,8 @@ import { Logger } from './Logger';
 const main = async () => {
 	if (process.env.RUN_ENV !== 'PROD') config();
 
+	Logger.info(`Starting ${process.env.RUN_ENV} mode`);
+
 	if (!process.env.PREFIX) {
 		Logger.error('No PREFIX set in env');
 		process.exit(1);

@@ -23,7 +23,9 @@ export class Logger {
 		console.log(`[\x1b[32mSUCCESS\x1b[0m] ${message}`);
 	}
 
-	static log(message: string) {
-		console.log(message);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static log(message?: any, ...optionalParams: any[]) {
+		if (process.env.RUN_ENV === 'DEBUG')
+			console.log(message, ...optionalParams);
 	}
 }
