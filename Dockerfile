@@ -22,12 +22,8 @@ RUN yarn build
 FROM node:alpine
 
 ENV NODE_ENV production
-ENV TZ=Europe/Paris
 
 WORKDIR /app
-
-RUN apk add --no-cache tzdata
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN chown -R node:node /app && chmod -R 755 /app
 
