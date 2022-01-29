@@ -1,6 +1,8 @@
 FROM node:latest as builder
 
 ENV NODE_ENV build
+ENV TZ=Europe/Paris
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 USER node
 
@@ -22,6 +24,8 @@ RUN yarn build
 FROM node:latest
 
 ENV NODE_ENV production
+ENV TZ=Europe/Paris
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /app
 
