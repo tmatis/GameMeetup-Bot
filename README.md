@@ -13,6 +13,7 @@ You can plan a game meetup and it will create channel and send reminders to user
 ## ENV
 
 ```env
+RUN_ENV=DEBUG
 BOT_TOKEN=<token>
 PREFIX=!
 ```
