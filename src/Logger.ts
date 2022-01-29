@@ -1,30 +1,30 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  ** colored logs
  */
 
 export class Logger {
-	static info(message: string) {
-		console.log(`[\x1b[1m\x1b[37mINFO\x1b[0m\x1b[0m] ${message}`);
+	static info(message?: any, ...optionalParams: any[]) {
+		console.log('[\x1b[1m\x1b[37mINFO\x1b[0m\x1b[0m]', message, ...optionalParams);
 	}
 
-	static error(message: string) {
-		console.log(`[\x1b[31mERROR\x1b[0m] ${message}`);
+	static error(message?: any, ...optionalParams: any[]) {
+		console.log('[\x1b[31mERROR\x1b[0m]', message, ...optionalParams);
 	}
 
-	static warn(message: string) {
-		console.log(`[\x1b[33mWARN\x1b[0m] ${message}`);
+	static warn(message?: any, ...optionalParams: any[]) {
+		console.log('[\x1b[33mWARN\x1b[0m]', message, ...optionalParams);
 	}
 
-	static debug(message: string) {
+	static debug(message?: any, ...optionalParams: any[]) {
 		if (process.env.RUN_ENV === 'DEBUG')
-			console.log(`[\x1b[34mDEBUG\x1b[0m] ${message}`);
+			console.log('[\x1b[34mDEBUG\x1b[0m]', message, ...optionalParams);
 	}
 
-	static success(message: string) {
-		console.log(`[\x1b[32mSUCCESS\x1b[0m] ${message}`);
+	static success(message?: any, ...optionalParams: any[]) {
+		console.log('[\x1b[32mSUCCESS\x1b[0m]', message, ...optionalParams);
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static log(message?: any, ...optionalParams: any[]) {
 		console.log(message, ...optionalParams);
 	}

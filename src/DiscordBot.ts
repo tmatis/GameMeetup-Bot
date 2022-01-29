@@ -34,6 +34,20 @@ export class DiscordBot {
 		});
 	}
 
+	private static sanitizeChannelName(name: string) {
+		// if there is only space throw an error
+		let newName = name.trim()
+		if (newName.length === 0) {
+			throw new Error('Channel name cannot be empty');
+		}
+		newName = newName.toLowerCase();
+		// replace multiple space with one
+		newName = newName.replace(/\s+/g, ' ');
+		// replace all spaces with dashes
+		newName = newName.replace(/ /g, '-');
+		return newName;
+	}
+
 	public login(token: string) {
 		Logger.info('logging in...');
 		this._client.login(token);
@@ -54,7 +68,68 @@ export class DiscordBot {
 						);
 						return;
 					}
-					const game = args[0];
+
+					try {
+						const game = DiscordBot.sanitizeChannelName(args[0]);
+						Logger.debug(`sanitized game name: ${game}`);
+						if (!/^[0-9]{2}:[0-9]{2}$/.test(args[1])) {
+							MessageUtil.sendErrorMessage(
+								message.channel,
+								'Bad format! Use `need hh:mm`'
+							);
+							return;
+						}
+
+						const date = new Date();
+						const actualDate = new Date();
+						const hour = parseInt(args[1].split(':')[0]);
+						const minute = parseInt(args[1].split(':')[1]);
+						date.setHours(hour);
+						date.setMinutes(minute);
+
+						if (date.getTime() < actualDate.getTime()) {
+							date.setDate(date.getDate() + 1);
+						}
+
+						if (isNaN(date.getTime())) {
+							MessageUtil.sendErrorMessage(
+								message.channel,
+								'the date is not valid'
+							);
+							return;
+						}
+
+						const maxParticipants = args[2]
+							? parseInt(args[2])
+							: Infinity;
+
+						this._gameMeetups.push(
+							new GameMeetup({
+								channel: message.channel,
+								creator: message.author,
+								game: game,
+								meetdate: date,
+								buttonHandler: this._buttonHandler,
+								max_participants: maxParticipants,
+								guild: message.guild as Guild,
+								removeMeetup: (meetup: GameMeetup) => {
+									Logger.debug(
+										`removed meetup ${meetup.id} from list`
+									);
+									this._gameMeetups = this._gameMeetups.filter(
+										(m) => m.id !== meetup.id
+									);
+								},
+							})
+						);
+					} catch (e) {
+						MessageUtil.sendErrorMessage(
+							message.channel,
+							`Error: ${(e as Error).message}`
+						);
+						Logger.debug(`Error: ${(e as Error).message}`);
+						return;
+					}
 
 					// the format of the date is HH:mm in 24h format
 					// if the date is lower than our current time, we add a day
@@ -63,56 +138,7 @@ export class DiscordBot {
 					// get actual date
 
 					// check if the format is correct
-					if (!/^[0-9]{2}:[0-9]{2}$/.test(args[1])) {
-						MessageUtil.sendErrorMessage(
-							message.channel,
-							'Bad format! Use `need hh:mm`'
-						);
-						return;
-					}
 
-					const date = new Date();
-					const actualDate = new Date();
-					const hour = parseInt(args[1].split(':')[0]);
-					const minute = parseInt(args[1].split(':')[1]);
-					date.setHours(hour);
-					date.setMinutes(minute);
-
-					if (date.getTime() < actualDate.getTime()) {
-						date.setDate(date.getDate() + 1);
-					}
-
-					if (isNaN(date.getTime())) {
-						MessageUtil.sendErrorMessage(
-							message.channel,
-							'the date is not valid'
-						);
-						return;
-					}
-
-					const maxParticipants = args[2]
-						? parseInt(args[2])
-						: Infinity;
-
-					this._gameMeetups.push(
-						new GameMeetup({
-							channel: message.channel,
-							creator: message.author,
-							game: game,
-							meetdate: date,
-							buttonHandler: this._buttonHandler,
-							max_participants: maxParticipants,
-							guild: message.guild as Guild,
-							removeMeetup: (meetup: GameMeetup) => {
-								Logger.debug(
-									`removed meetup ${meetup.id} from list`
-								);
-								this._gameMeetups = this._gameMeetups.filter(
-									(m) => m.id !== meetup.id
-								);
-							},
-						})
-					);
 				},
 			},
 		];

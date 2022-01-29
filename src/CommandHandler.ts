@@ -1,4 +1,6 @@
+import { Logger } from './Logger';
 import { Client, Message, MessageEmbed, MessageOptions } from 'discord.js';
+import { MessageUtil } from './MessageUtil';
 
 export type Command = {
 	name: string;
@@ -34,6 +36,45 @@ export class CommandHandler {
 		});
 	}
 
+	/*
+	** tokenize
+	** "!help" -> ["!help"]
+	** "!help test" -> ["!help", "test"]
+	** "!help 'test test'" -> ["!help", "test test"]
+	*/
+	private static tokenize(message: string): string[] {
+		// first check if the ' and " count is even
+		let singleQuoteCount = 0;
+		for (let i = 0; i < message.length; i++) {
+			if (message[i] === '\'')
+				singleQuoteCount++;
+		}
+		if (singleQuoteCount % 2 !== 0) {
+			throw new Error('Unbalanced quotes');
+		}
+
+		const tokens: string[] = [];
+		let currentToken = '';
+		let inQuotes = false;
+		for (let i = 0; i < message.length; i++) {
+			const char = message[i];
+			if (char === ' ' && !inQuotes) {
+				if (currentToken.length > 0) {
+					tokens.push(currentToken);
+					currentToken = '';
+				}
+			} else if (char === "'") {
+				inQuotes = !inQuotes;
+			} else {
+				currentToken += char;
+			}
+		}
+		if (currentToken.length > 0) {
+			tokens.push(currentToken);
+		}
+		return tokens;
+	}
+
 	public registerCommand(command: Command) {
 		this._commands.push(command);
 	}
@@ -41,22 +82,32 @@ export class CommandHandler {
 	public handleMessage(message: Message<boolean>) {
 		if (!message.content.startsWith(this._prefix)) return;
 
-		// cut by space and remove prefix
-		const args = message.content.slice(this._prefix.length).split(/ +/);
+		try {
+			const args = CommandHandler.tokenize(
+				message.content.substring(this._prefix.length)
+			);
 
-		if (args.length < 1) return;
+			if (args.length < 1) return;
 
-		const commandName = (args.shift() as string).toLowerCase();
-		const command = this._commands.find((c) => c.name === commandName);
+			const commandName = (args.shift() as string).toLowerCase();
+			const command = this._commands.find((c) => c.name === commandName);
 
-		if (!command) return;
+			if (!command) return;
 
-		if (command.dm_disabled && message.channel.type === 'DM') {
-			message.channel.send('This command is not available in DMs');
+			if (command.dm_disabled && message.channel.type === 'DM') {
+				message.channel.send('This command is not available in DMs');
+				return;
+			}
+
+			command.execute(message, args);
+		} catch (e) {
+			MessageUtil.sendErrorMessage(
+				message.channel,
+				`Error: ${(e as Error).message}`
+			);
+			Logger.debug(`Error: ${(e as Error).message}`);
 			return;
 		}
-
-		command.execute(message, args);
 	}
 
 	private generateHelpMessage(): MessageOptions {

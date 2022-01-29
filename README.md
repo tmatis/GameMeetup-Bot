@@ -7,8 +7,9 @@ You can plan a game meetup and it will create channel and send reminders to user
 
 ## TODO
 
-[ ] tokenisation of '' counting space
-[ ] sanitize user input, space maj ..
+[x] tokenisation of '' counting space
+[x] sanitize user input, space maj ..
+[ ] auto deploy on production
 
 ## ENV
 
