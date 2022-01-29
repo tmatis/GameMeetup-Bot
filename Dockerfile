@@ -22,8 +22,11 @@ RUN yarn build
 FROM node:alpine
 
 ENV NODE_ENV production
+ENV TZ=Europe/Paris
 
 WORKDIR /app
+
+RUN apk add --no-cache tzdata
 
 RUN chown -R node:node /app && chmod -R 755 /app
 
