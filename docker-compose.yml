@@ -1,0 +1,12 @@
+version: '3.3'
+services:
+        gamemeetupbot:
+                build: 
+                  context: ./
+                image: gamemeetupbot:v1
+                environment:
+                        - RUN_ENV=${RUN_ENV}
+                        - BOT_TOKEN=${BOT_TOKEN}
+                        - PREFIX=${PREFIX}
+                container_name: gamemeetupbot
+                restart: always
