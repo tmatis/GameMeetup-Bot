@@ -16,7 +16,8 @@ export class Logger {
 	}
 
 	static debug(message: string) {
-		console.log(`[\x1b[34mDEBUG\x1b[0m] ${message}`);
+		if (process.env.RUN_ENV === 'DEBUG')
+			console.log(`[\x1b[34mDEBUG\x1b[0m] ${message}`);
 	}
 
 	static success(message: string) {
@@ -25,7 +26,6 @@ export class Logger {
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static log(message?: any, ...optionalParams: any[]) {
-		if (process.env.RUN_ENV === 'DEBUG')
-			console.log(message, ...optionalParams);
+		console.log(message, ...optionalParams);
 	}
 }
