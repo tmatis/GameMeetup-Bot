@@ -456,7 +456,7 @@ export class GameMeetup {
 		}
 	}
 
-	private setupTimers() {
+	private async setupTimers() {
 		const reminder_time = this._info.meetdate.getTime() - 10 * 60 * 1000;
 		if (reminder_time > Date.now()) {
 			this._timers.push(
@@ -478,7 +478,7 @@ export class GameMeetup {
 					this.createChannels();
 				}, channel_time - Date.now())
 			);
-		} else this.createChannels();
+		} else await this.createChannels();
 
 		// on the meetup date send a message to all participants not in the channel
 		this._timers.push(
