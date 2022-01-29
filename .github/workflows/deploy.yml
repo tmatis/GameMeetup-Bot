@@ -1,16 +1,16 @@
 name: Deploy on production
 on:
-  push:
-    branches: [ master ]
+    push:
+        branches: [master]
 
 jobs:
-  deploy-vps:
-    name: Deploy cluster
-    runs-on: ubuntu-latest
-    steps:
-      - name: prepare ssh folder
-        run: mkdir -p ~/.ssh
-      - name: Allow fingerprint
-        run: echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-      - name: deploy
-        run: eval $(ssh-agent -s) && ssh-add <(echo "${{ secrets.SSH_KEY }}") && ssh ${{ secrets.DEPLOY_LOGIN }}@${{ secrets.DEPLOY_HOST }} "cd GameMeetup-Bot && docker-compose down; git pull && docker-compose up -d --build"
+    deploy-vps:
+        name: Deploy cluster
+        runs-on: ubuntu-latest
+        steps:
+            - name: prepare ssh folder
+              run: mkdir -p ~/.ssh
+            - name: Allow fingerprint
+              run: echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+            - name: deploy
+              run: eval $(ssh-agent -s) && ssh-add <(echo "${{ secrets.SSH_KEY }}") && ssh ${{ secrets.DEPLOY_LOGIN }}@${{ secrets.DEPLOY_HOST }} "cd GameMeetup-Bot && docker-compose down; git pull && docker-compose up -d --build"
