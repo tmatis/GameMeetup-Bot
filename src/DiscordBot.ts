@@ -58,13 +58,13 @@ export class DiscordBot {
 			{
 				name: 'gamemeet',
 				description: 'Create a game meetup',
-				usage: 'gamemeet gamename hh:mm [max_participants]',
+				usage: 'gamemeet \'gamename\' hh:mm [max_participants]',
 				dm_disabled: true,
 				execute: async (message, args) => {
-					if (args.length < 2) {
+					if (args.length < 2 || args.length > 3) {
 						MessageUtil.sendErrorMessage(
 							message.channel,
-							'Bad usage! Use `gamemeet gamename hh:mm [max_participants]`'
+							'Bad usage! Use `gamemeet \'gamename\' hh:mm [max_participants]`'
 						);
 						return;
 					}
