@@ -25,6 +25,10 @@ ENV NODE_ENV production
 
 WORKDIR /app
 
+RUN apk update && apk add tzdata
+
+ENV TZ=Europe/Paris
+
 RUN chown -R node:node /app && chmod -R 755 /app
 
 USER node
