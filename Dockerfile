@@ -27,7 +27,7 @@ WORKDIR /app
 
 RUN apk update && apk add tzdata
 
-ENV TZ=Europe/Paris
+RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime
 
 RUN chown -R node:node /app && chmod -R 755 /app
 
