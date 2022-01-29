@@ -1,3 +1,4 @@
+import { TimeUtils } from './TimeUtils';
 import { MessageUtil } from './MessageUtil';
 import { Client, Guild, Intents } from 'discord.js';
 import { ButtonHandler } from './ButtonHandler';
@@ -72,57 +73,42 @@ export class DiscordBot {
 					try {
 						const game = DiscordBot.sanitizeChannelName(args[0]);
 						Logger.debug(`sanitized game name: ${game}`);
-						if (!/^[0-9]{2}:[0-9]{2}$/.test(args[1])) {
-							MessageUtil.sendErrorMessage(
-								message.channel,
-								'Bad format! Use `need hh:mm`'
-							);
-							return;
-						}
 
-						const date = new Date();
-						const actualDate = new Date();
-						const hour = parseInt(args[1].split(':')[0]);
-						const minute = parseInt(args[1].split(':')[1]);
-						date.setHours(hour);
-						date.setMinutes(minute);
+						try {
+							const date = TimeUtils.parseDateTZ(args[1]);
+							Logger.debug(`parsed date: ${date.toISOString()}`);
+							const maxParticipants = args[2]
+								? parseInt(args[2])
+								: Infinity;
 
-						if (date.getTime() < actualDate.getTime()) {
-							date.setDate(date.getDate() + 1);
-						}
-
-						if (isNaN(date.getTime())) {
-							MessageUtil.sendErrorMessage(
-								message.channel,
-								'the date is not valid'
-							);
-							return;
-						}
-
-						const maxParticipants = args[2]
-							? parseInt(args[2])
-							: Infinity;
-
-						this._gameMeetups.push(
-							new GameMeetup({
-								channel: message.channel,
-								creator: message.author,
-								game: game,
-								meetdate: date,
-								buttonHandler: this._buttonHandler,
-								max_participants: maxParticipants,
-								guild: message.guild as Guild,
-								removeMeetup: (meetup: GameMeetup) => {
-									Logger.debug(
-										`removed meetup ${meetup.id} from list`
-									);
-									this._gameMeetups =
-										this._gameMeetups.filter(
-											(m) => m.id !== meetup.id
+							this._gameMeetups.push(
+								new GameMeetup({
+									channel: message.channel,
+									creator: message.author,
+									game: game,
+									meetdate: date,
+									buttonHandler: this._buttonHandler,
+									max_participants: maxParticipants,
+									guild: message.guild as Guild,
+									removeMeetup: (meetup: GameMeetup) => {
+										Logger.debug(
+											`removed meetup ${meetup.id} from list`
 										);
-								},
-							})
-						);
+										this._gameMeetups =
+											this._gameMeetups.filter(
+												(m) => m.id !== meetup.id
+											);
+									},
+								})
+							);
+						} catch (e) {
+							MessageUtil.sendErrorMessage(
+								message.channel,
+								'Bad date format! Use `need hh:mm`'
+							);
+						}
+
+						
 					} catch (e) {
 						MessageUtil.sendErrorMessage(
 							message.channel,

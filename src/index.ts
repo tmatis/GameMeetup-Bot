@@ -5,9 +5,6 @@ import { Logger } from './Logger';
 const main = async () => {
 	if (process.env.RUN_ENV !== 'PROD') config();
 
-	// set timezone to Paris
-	process.env.TZ = 'Europe/Paris';
-
 	Logger.info(
 		`Starting ${process.env.RUN_ENV} mode at ${new Date().toISOString()}`
 	);

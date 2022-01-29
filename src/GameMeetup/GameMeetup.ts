@@ -18,6 +18,7 @@ import {
 	GameMeetupOptions,
 } from './GMTypes';
 import { MessageUtil } from '../MessageUtil';
+import { TimeUtils } from '../TimeUtils';
 
 /*
  ** Game Meetup
@@ -63,17 +64,6 @@ export class GameMeetup {
 	/*
 	 ** format date to string HH:MM
 	 */
-
-	public static formatDate(date: Date): string {
-		// we need to add 0 if only one digit
-		const hours =
-			date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
-		const minutes =
-			date.getMinutes() < 10
-				? `0${date.getMinutes()}`
-				: date.getMinutes();
-		return `${hours}:${minutes}`;
-	}
 
 	public get id(): number {
 		return this._id;
@@ -153,7 +143,7 @@ export class GameMeetup {
 		const embed = new MessageEmbed();
 
 		// the title will be in the format "Game Meetup: <game> hh:mm"
-		const title = `Game Meetup: ${this._info.game} ${GameMeetup.formatDate(
+		const title = `Game Meetup: ${this._info.game} ${TimeUtils.formatDateTimeTZ(
 			this._info.meetdate
 		)}`;
 		embed.setTitle(title);
@@ -601,7 +591,7 @@ export class GameMeetup {
 							MessageUtil.generateEmbedMessage(
 								`Game Meetup: ${
 									this._info.game
-								} ${GameMeetup.formatDate(
+								} ${TimeUtils.formatDateTimeTZ(
 									this._info.meetdate
 								)}`,
 								'You canceled your participation.',
@@ -643,7 +633,7 @@ export class GameMeetup {
 						MessageUtil.generateEmbedMessage(
 							`Game Meetup: ${
 								this._info.game
-							} ${GameMeetup.formatDate(this._info.meetdate)}`,
+							} ${TimeUtils.formatDateTimeTZ(this._info.meetdate)}`,
 							'You canceled your participation.',
 							0xff0000
 						)
@@ -692,7 +682,7 @@ export class GameMeetup {
 		Logger.info(
 			`GameMeetup ${this._id} created for ${
 				this._info.game
-			} ${GameMeetup.formatDate(this._info.meetdate)}`
+			} ${TimeUtils.formatDateTimeTZ(this._info.meetdate)}`
 		);
 	}
 }
