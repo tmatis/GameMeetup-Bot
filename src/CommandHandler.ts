@@ -37,17 +37,16 @@ export class CommandHandler {
 	}
 
 	/*
-	** tokenize
-	** "!help" -> ["!help"]
-	** "!help test" -> ["!help", "test"]
-	** "!help 'test test'" -> ["!help", "test test"]
-	*/
+	 ** tokenize
+	 ** "!help" -> ["!help"]
+	 ** "!help test" -> ["!help", "test"]
+	 ** "!help 'test test'" -> ["!help", "test test"]
+	 */
 	private static tokenize(message: string): string[] {
 		// first check if the ' and " count is even
 		let singleQuoteCount = 0;
 		for (let i = 0; i < message.length; i++) {
-			if (message[i] === '\'')
-				singleQuoteCount++;
+			if (message[i] === "'") singleQuoteCount++;
 		}
 		if (singleQuoteCount % 2 !== 0) {
 			throw new Error('Unbalanced quotes');

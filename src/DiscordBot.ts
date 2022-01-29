@@ -36,7 +36,7 @@ export class DiscordBot {
 
 	private static sanitizeChannelName(name: string) {
 		// if there is only space throw an error
-		let newName = name.trim()
+		let newName = name.trim();
 		if (newName.length === 0) {
 			throw new Error('Channel name cannot be empty');
 		}
@@ -116,9 +116,10 @@ export class DiscordBot {
 									Logger.debug(
 										`removed meetup ${meetup.id} from list`
 									);
-									this._gameMeetups = this._gameMeetups.filter(
-										(m) => m.id !== meetup.id
-									);
+									this._gameMeetups =
+										this._gameMeetups.filter(
+											(m) => m.id !== meetup.id
+										);
 								},
 							})
 						);
@@ -138,7 +139,6 @@ export class DiscordBot {
 					// get actual date
 
 					// check if the format is correct
-
 				},
 			},
 		];

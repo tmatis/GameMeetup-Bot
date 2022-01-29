@@ -1,28 +1,28 @@
 {
-    "name": "gamemeetup",
-    "description": "Game planning",
-    "license": "MIT",
-    "version": "0.9",
-    "packageManager": "yarn@3.1.1",
-    "dependencies": {
-        "@types/node": "^17.0.10",
-        "discord.js": "^13.6.0",
-        "dotenv": "^14.3.0",
-        "typescript": "^4.5.5"
-    },
-    "devDependencies": {
-        "@types/eslint": "^8",
-        "@types/prettier": "^2",
-        "@typescript-eslint/eslint-plugin": "^5.10.1",
-        "@typescript-eslint/parser": "^5.10.1",
-        "eslint": "^8.7.0",
-        "nodemon": "^2.0.15",
-        "prettier": "^2.5.1",
-        "ts-node": "^10.4.0"
-    },
-    "scripts": {
-        "build": "tsc",
-        "start:dev": "eslint; nodemon",
-        "start": "ts-node ./src/index.ts"
-    }
+	"name": "gamemeetup",
+	"description": "Game planning",
+	"license": "MIT",
+	"version": "0.9",
+	"packageManager": "yarn@3.1.1",
+	"dependencies": {
+		"@types/node": "^17.0.10",
+		"discord.js": "^13.6.0",
+		"dotenv": "^14.3.0",
+		"typescript": "^4.5.5"
+	},
+	"devDependencies": {
+		"@types/eslint": "^8",
+		"@types/prettier": "^2",
+		"@typescript-eslint/eslint-plugin": "^5.10.1",
+		"@typescript-eslint/parser": "^5.10.1",
+		"eslint": "^8.7.0",
+		"nodemon": "^2.0.15",
+		"prettier": "^2.5.1",
+		"ts-node": "^10.4.0"
+	},
+	"scripts": {
+		"build": "tsc",
+		"start:dev": "eslint; nodemon",
+		"start": "ts-node ./src/index.ts"
+	}
 }
