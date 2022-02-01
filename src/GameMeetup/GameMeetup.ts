@@ -366,8 +366,7 @@ export class GameMeetup {
 		this._messages.generalMessage?.edit(message);
 		this._messages.ownerMessage?.edit(message);
 		this._participants.forEach((p) => {
-			this._messages.participantsMessage[p.id]?.delete();
-			p.send(message);
+			this._messages.participantsMessage[p.id]?.edit(message);
 		});
 		this._maybe_participants.forEach((p) => {
 			this._messages.maybeParticipantsMessage[p.id]?.edit(message);
